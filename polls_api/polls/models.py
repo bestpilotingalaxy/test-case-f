@@ -26,7 +26,7 @@ class Poll(m.Model):
 class Question(m.Model):
     """
     Question model object.
-    Refere to Poll (many to one).
+    Refer to Poll (many to one).
     """
     QUESTION_TYPES = [
         ('text_response', 'Ответ текстом'),
@@ -57,10 +57,17 @@ class Question(m.Model):
 
 class Variant(m.Model):
     """
+    Answer variant for question.
+    Refer to Question (many to one).
     """
     question = m.ForeignKey(
         Question,
         verbose_name='Вопрос',
+        on_delete=m.CASCADE
+    )
+    poll = m.ForeignKey(
+        Poll,
+        verbose_name='Опрос',
         on_delete=m.CASCADE
     )
     text = m.CharField('Вариант ответа', max_length=200)
@@ -76,12 +83,17 @@ class Variant(m.Model):
 class Answer(m.Model):
     """
     Answer model object.
-    Refere to Question (many to one). 
+    Refer to Question (many to one) and to Poll (many to one).
     """
     user_id = m.CharField('id Пользователя', max_length=200)
     question = m.ForeignKey(
         Question,
         verbose_name='Вопрос',
+        on_delete=m.CASCADE
+    )
+    poll = m.ForeignKey(
+        Poll,
+        verbose_name='Опрос',
         on_delete=m.CASCADE
     )
     text = m.CharField('Ответ', max_length=200)
