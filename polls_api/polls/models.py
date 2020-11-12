@@ -2,7 +2,9 @@ from django.db import models as m
 
 
 class Poll(m.Model):
-    
+    """
+    Poll model object.
+    """
     name = m.CharField('Название', max_length=200)
     start_date = m.DateTimeField('Дата старта')
     end_date = m.DateTimeField('Дата окончания')
@@ -18,8 +20,9 @@ class Poll(m.Model):
 
 class Question(m.Model):
     """
+    Question model object.
+    Refere to Poll (many to one).
     """
-    
     QUESTION_TYPES = [
         ('text_response', 'Ответ текстом'),
         ('single_choice', 'Ответ с выбором одного варианта'),
@@ -45,8 +48,9 @@ class Question(m.Model):
 
 class Answer(m.Model):
     """
+    Answer model object.
+    Refere to Question (many to one). 
     """
-    
     question = m.ForeignKey(
         Question,
         verbose_name='Вопрос',
