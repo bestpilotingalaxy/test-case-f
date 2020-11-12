@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models as m
 
 
@@ -10,8 +12,11 @@ class Poll(m.Model):
     end_date = m.DateTimeField('Дата окончания')
     description = m.TextField('Описание', max_length=1000, blank=True)
     
+    def is_active(self):
+        return self.start_date<=datetime.datetime.now<=self.end_date
+    
     def __str__(self):
-        return self.name
+        return f'{self.name} ({self.start_date} - {self.end_date})'
     
     class Meta:
         verbose_name = 'Опрос'
@@ -29,7 +34,11 @@ class Question(m.Model):
         ('multiple_choice', 'Ответ с выбором нескольких вариантов')
     ]
     
-    poll = m.ForeignKey(Poll, verbose_name='Опрос', on_delete=m.CASCADE)
+    poll = m.ForeignKey(
+        Poll,
+        verbose_name='Опрос',
+        on_delete=m.CASCADE
+    )
     text = m.TextField('Текст вопроса', max_length=200)
     question_type = m.CharField(
         'Тип вопроса',
@@ -39,27 +48,46 @@ class Question(m.Model):
     )
 
     def __str__(self):
-        return f'{self.poll} -- {self.text}'
+        return f'{self.poll} | Вопрос: {self.text}'
     
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
     
 
-class Answer(m.Model):
+class Variant(m.Model):
     """
-    Answer model object.
-    Refere to Question (many to one). 
     """
     question = m.ForeignKey(
         Question,
         verbose_name='Вопрос',
         on_delete=m.CASCADE
     )
-    text = m.CharField('Текст ответа', max_length=200)
+    text = m.CharField('Вариант ответа', max_length=200)
     
     def __str__(self):
-        return f'{self.question} -- {self.text}'
+        return f'{self.question} | Вариант: {self.text}'
+    
+    class Meta:
+        verbose_name = 'Вариант ответа'
+        verbose_name_plural = 'Варианты ответа'
+  
+    
+class Answer(m.Model):
+    """
+    Answer model object.
+    Refere to Question (many to one). 
+    """
+    user_id = m.CharField('id Пользователя', max_length=200)
+    question = m.ForeignKey(
+        Question,
+        verbose_name='Вопрос',
+        on_delete=m.CASCADE
+    )
+    text = m.CharField('Ответ', max_length=200)
+    
+    def __str__(self):
+        return f'{self.question} | {self.text}'
     
     class Meta:
         verbose_name = 'Ответ'

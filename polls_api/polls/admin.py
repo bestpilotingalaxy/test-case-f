@@ -1,12 +1,25 @@
 from django.contrib import admin
-from .models import Poll, Question, Answer
+from .models import Poll, Question, Answer, Variant
 
 
-class QuestionInline(admin.TabularInline):
+class VariantInline(admin.TabularInline):
+    """"""
+    model = Variant
+
+
+class QuestionInline(admin.StackedInline):
     """
     Inline representation for questions.
     """
     model = Question
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    inlines = [
+        VariantInline,
+    ]
+    class Meta:
+        model = Question
 
 
 class PollAdmin(admin.ModelAdmin):
@@ -24,5 +37,6 @@ class PollAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Poll, PollAdmin)
-admin.site.register(Question)
+admin.site.register(Question, QuestionAdmin)
 admin.site.register(Answer)
+admin.site.register(Variant)
