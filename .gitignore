@@ -206,3 +206,6 @@ fabric.properties
 # enviroment
 venv
 .venv
+
+# vscode
+.vscode
