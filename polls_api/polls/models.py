@@ -12,9 +12,6 @@ class Poll(m.Model):
     end_date = m.DateTimeField('Дата окончания')
     description = m.TextField('Описание', max_length=1000, blank=True)
     
-    def is_active(self):
-        return self.start_date<=datetime.datetime.now<=self.end_date
-    
     def __str__(self):
         return f'{self.name} ({self.start_date} - {self.end_date})'
     
@@ -37,7 +34,8 @@ class Question(m.Model):
     poll = m.ForeignKey(
         Poll,
         verbose_name='Опрос',
-        on_delete=m.CASCADE
+        on_delete=m.CASCADE,
+        related_name='questions'
     )
     text = m.TextField('Текст вопроса', max_length=200)
     question_type = m.CharField(
@@ -63,7 +61,8 @@ class Variant(m.Model):
     question = m.ForeignKey(
         Question,
         verbose_name='Вопрос',
-        on_delete=m.CASCADE
+        on_delete=m.CASCADE,
+        related_name='variants'
     )
     poll = m.ForeignKey(
         Poll,
@@ -89,11 +88,6 @@ class Answer(m.Model):
     question = m.ForeignKey(
         Question,
         verbose_name='Вопрос',
-        on_delete=m.CASCADE
-    )
-    poll = m.ForeignKey(
-        Poll,
-        verbose_name='Опрос',
         on_delete=m.CASCADE
     )
     text = m.CharField('Ответ', max_length=200)
