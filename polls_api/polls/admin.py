@@ -2,10 +2,10 @@ from django.contrib import admin
 from .models import Poll, Question, Answer, Variant
 
 
-# TODO: Add third party for recursive inline models prezentation
-
 class VariantInline(admin.TabularInline):
-    """"""
+    """
+    Inline representation for variant.
+    """
     model = Variant
 
 
@@ -23,8 +23,6 @@ class PollAdmin(admin.ModelAdmin):
     inlines = [
         QuestionInline, VariantInline
     ]
-    # block start_date field for changing after object creation
-    # readonly_fields = ('start_date', )
     
     class Meta:
         model = Poll

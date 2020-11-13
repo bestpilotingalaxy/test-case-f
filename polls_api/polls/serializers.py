@@ -13,7 +13,7 @@ class AnswerDetailSerializer(ModelSerializer):
         exclude = ('session_key',)
     
     def save(self, **kwargs):
-        super().save(user_id=self.context['session_key'])
+        super().save(session_key=self.context['session_key'])
     
     def validate(self, attrs):
         """
@@ -21,7 +21,7 @@ class AnswerDetailSerializer(ModelSerializer):
         """
         answer = Answer.objects.filter(
             question_id=attrs['question'],
-            user_id=self.context['session_key']
+            session_key=self.context['session_key']
         )
         if answer:
             raise ValidationError('You already answeren this question.')
