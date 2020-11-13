@@ -84,10 +84,15 @@ class Answer(m.Model):
     Answer model object.
     Refer to Question (many to one) and to Poll (many to one).
     """
-    user_id = m.CharField('id Пользователя', max_length=200)
+    session_key = m.CharField('id анонимного пользователя', max_length=200)
     question = m.ForeignKey(
         Question,
         verbose_name='Вопрос',
+        on_delete=m.CASCADE
+    )
+    poll = m.ForeignKey(
+        Poll,
+        verbose_name='Опрос',
         on_delete=m.CASCADE
     )
     text = m.CharField('Ответ', max_length=200)

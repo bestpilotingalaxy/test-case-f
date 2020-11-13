@@ -14,6 +14,8 @@ urlpatterns = format_suffix_patterns([
     path('question/', views.QuestionViewSet.as_view(
         {'post': 'create', 'put': 'update', 'delete': 'destroy'}
     )),
-    path('answer/', views.AnswerViewSet.as_view()),
+    path('answer/', views.CreateAnswerView.as_view()),
+
+    path('answers/<int:pk>/', views.AnswerListView.as_view()),
 
 ])

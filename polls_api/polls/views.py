@@ -1,4 +1,5 @@
 import datetime
+from django.http import request
 
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework import mixins
@@ -21,10 +22,15 @@ class PollViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     """
+    Full CRUD and List sctions for Poll model.
     """
     queryset = Poll.objects.all()
 
     def list(self, request):
+        """
+        List action with queryset filters by date.
+        Query only active polls.
+        """
         queryset = Poll.objects.filter(
             start_date__lte=datetime.datetime.today(),
             end_date__gte=datetime.datetime.today()
@@ -34,6 +40,7 @@ class PollViewSet(mixins.CreateModelMixin,
     
     def get_permissions(self):
         """
+        Select permission class based on request action.
         """
         if self.action in ['create', 'update', 'destroy']:
             permission_classes = [permissions.IsAdminUser] 
@@ -44,6 +51,7 @@ class PollViewSet(mixins.CreateModelMixin,
 
     def get_serializer_class(self):
         """
+        Select serializer class based on request action.
         """
         if self.action=='update':
             serializer_class = UpdatePollSerializer
@@ -58,28 +66,38 @@ class QuestionViewSet(mixins.CreateModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
     """
+    Create, Update, Destroy actions for Question model.
     """
     queryset = Question.objects.all()
     serializer_class = QuestionDetailSerializer
-    
-    def get_permissions(self):
-        """
-        """
-        if self.action in ['create', 'update', 'destroy']:
-            permission_classes = [permissions.IsAdminUser] 
-        else:
-            permission_classes = [permissions.AllowAny]
-        
-        return [permission() for permission in permission_classes]
+    permission_classes = [permissions.IsAdminUser,]
 
 
-# class AnswerViewSet(CreateAPIView):
-#     """
-#     """
-#     queryset = Answer.objects.all()
-#     serializer_class = AnswerDetailSerializer
+class CreateAnswerView(CreateAPIView):
+    """
+    Answer create view for anonimous users.
+    """
+    queryset = Answer.objects.all()
+    serializer_class = AnswerDetailSerializer
     
-#     def get_serializer_context(self):
-#         context = super().get_serializer_context()
-#         context.update({"session": self.request.session.session_key})
-#         return context
+    def get_serializer_context(self):
+        """
+        Add anonimous user session key to serializer context.
+        """
+        context = super(CreateAnswerView, self).get_serializer_context()
+        context.update({'session_key': self.request.session.session_key})
+        return context
+    
+
+class AnswerListView(ListAPIView):
+    """
+    List view for user answers representation.
+    """
+    serializer_class = AnswerDetailSerializer
+    def get_queryset(self):
+        """
+        Filter answers by user session key and poll_id from request kwargs.
+        """
+        session_key = self.request.session.session_key
+        queryset = Answer.objects.filter(session_key=session_key, poll=self.kwargs['pk'])
+        return queryset
