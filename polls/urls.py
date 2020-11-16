@@ -7,10 +7,9 @@ from . import views
 urlpatterns = format_suffix_patterns([
     
     # Polls CRUD
-    path('poll/<int:pk>/', views.PollViewSet.as_view(
+    path('polls/<int:pk>/', views.PollViewSet.as_view(
         {
             'get': 'retrieve',
-            'post': 'create',
             'put': 'update',
             'delete': 'destroy'
         }
@@ -22,14 +21,22 @@ urlpatterns = format_suffix_patterns([
         }
     )),
     # Question CRUD
-    path('question/', views.QuestionViewSet.as_view(
+    path('questions/<int:pk>/', views.QuestionViewSet.as_view(
         {
-            'post': 'create',
             'put': 'update',
             'delete': 'destroy'
         }
     )),
+    path('questions/', views.QuestionViewSet.as_view(
+        {
+            'post': 'create'
+        }
+    )),
     # Answers urls
-    path('answer/', views.CreateAnswerView.as_view()),
-    path('answers/<int:pk>/', views.AnswerListView.as_view()),
+    path('answers/<int:pk>/', views.AnswerViewSet.as_view(
+        {
+            'post': 'create',
+            'get': 'list'
+        }
+    ))
 ])

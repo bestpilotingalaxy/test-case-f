@@ -1,5 +1,4 @@
 import datetime
-from django.http import request
 
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework import mixins
@@ -12,7 +11,7 @@ from .serializers import (
     PollDetailSerializer,
     UpdatePollSerializer,
     QuestionDetailSerializer,
-    AnswerDetailSerializer
+    AnswerCreateSerializer
 )
 
 
@@ -31,10 +30,13 @@ class PollViewSet(mixins.CreateModelMixin,
         List action with queryset filters by date.
         Query only active polls.
         """
-        queryset = Poll.objects.filter(
-            start_date__lte=datetime.datetime.today(),
-            end_date__gte=datetime.datetime.today()
-        )
+        if self.request.user.is_staff:
+            queryset = Poll.objects.all()
+        else:    
+            queryset = Poll.objects.filter(
+                start_date__lte=datetime.datetime.today(),
+                end_date__gte=datetime.datetime.today()
+            )
         serializer = UpdatePollSerializer(queryset, many=True)
         return Response(serializer.data)
     
@@ -73,31 +75,28 @@ class QuestionViewSet(mixins.CreateModelMixin,
     permission_classes = [permissions.IsAdminUser,]
 
 
-class CreateAnswerView(CreateAPIView):
+class AnswerViewSet(mixins.CreateModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
     """
-    Answer create view for anonimous users.
     """
-    queryset = Answer.objects.all()
-    serializer_class = AnswerDetailSerializer
+    serializer_class = AnswerCreateSerializer
     
     def get_serializer_context(self):
         """
         Add anonimous user session key to serializer context.
         """
-        context = super(CreateAnswerView, self).get_serializer_context()
-        context.update({'session_key': self.request.session.session_key})
+        context = super(AnswerViewSet, self).get_serializer_context()
+        context.update({'session_key': self.request.session.session_key, 'poll': Poll.objects.get(pk=self.kwargs['pk'])})
         return context
     
-
-class AnswerListView(ListAPIView):
-    """
-    List view for user answers representation.
-    """
-    serializer_class = AnswerDetailSerializer
     def get_queryset(self):
         """
         Filter answers by user session key and poll_id from request kwargs.
         """
         session_key = self.request.session.session_key
-        queryset = Answer.objects.filter(session_key=session_key, poll=self.kwargs['pk'])
+        queryset = Answer.objects.filter(
+            session_key=session_key,
+            poll=self.kwargs['pk']
+        )
         return queryset

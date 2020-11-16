@@ -4,16 +4,20 @@ from rest_framework.serializers import ModelSerializer, ListSerializer
 from .models import Poll, Question, Answer, Variant
 
 
-class AnswerDetailSerializer(ModelSerializer):
+class AnswerCreateSerializer(ModelSerializer):
     """
-    Serialize answer, prevent duplicate answering and get user session key.
+    Serialize answer, prevent duplicate answering.
+    Set user session key and poll id.
     """
     class Meta:
         model = Answer
-        exclude = ('session_key',)
+        exclude = ('session_key', 'poll')
     
     def save(self, **kwargs):
-        super().save(session_key=self.context['session_key'])
+        super().save(
+            session_key=self.context['session_key'],
+            poll=self.context['poll']
+        )
     
     def validate(self, attrs):
         """
@@ -24,7 +28,7 @@ class AnswerDetailSerializer(ModelSerializer):
             session_key=self.context['session_key']
         )
         if answer:
-            raise ValidationError('You already answeren this question.')
+            raise ValidationError('You already answered this question.')
         return attrs
     
 
