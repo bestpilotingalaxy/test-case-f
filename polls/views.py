@@ -1,6 +1,5 @@
 import datetime
 
-from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -24,7 +23,7 @@ class PollViewSet(mixins.CreateModelMixin,
     Full CRUD and List sctions for Poll model.
     """
     queryset = Poll.objects.all()
-
+    
     def list(self, request):
         """
         List action with queryset filters by date.

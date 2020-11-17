@@ -6,6 +6,13 @@ from . import views
 
 urlpatterns = format_suffix_patterns([
     
+    # Answers urls
+    path('polls/<int:pk>/answers/', views.AnswerViewSet.as_view(
+        {
+            'post': 'create',
+            'get': 'list'
+        }
+    )),
     # Polls CRUD
     path('polls/<int:pk>/', views.PollViewSet.as_view(
         {
@@ -32,11 +39,4 @@ urlpatterns = format_suffix_patterns([
             'post': 'create'
         }
     )),
-    # Answers urls
-    path('answers/<int:pk>/', views.AnswerViewSet.as_view(
-        {
-            'post': 'create',
-            'get': 'list'
-        }
-    ))
 ])
