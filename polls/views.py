@@ -27,7 +27,7 @@ class PollViewSet(mixins.CreateModelMixin,
     def list(self, request):
         """
         List action with queryset filters by date.
-        Query only active polls.
+        Query only active polls for users and all polls for admins.
         """
         if self.request.user.is_staff:
             queryset = Poll.objects.all()
@@ -78,6 +78,7 @@ class AnswerViewSet(mixins.CreateModelMixin,
                     mixins.ListModelMixin,
                     viewsets.GenericViewSet):
     """
+    Viewset for Answer model with create and list actions. 
     """
     serializer_class = AnswerCreateSerializer
     
@@ -86,7 +87,10 @@ class AnswerViewSet(mixins.CreateModelMixin,
         Add anonimous user session key to serializer context.
         """
         context = super(AnswerViewSet, self).get_serializer_context()
-        context.update({'session_key': self.request.session.session_key, 'poll': Poll.objects.get(pk=self.kwargs['pk'])})
+        context.update({
+            'session_key': self.request.session.session_key,
+            'poll': Poll.objects.get(pk=self.kwargs['pk'])
+        })
         return context
     
     def get_queryset(self):
