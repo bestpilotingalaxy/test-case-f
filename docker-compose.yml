@@ -13,14 +13,13 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - postgres
+      - postgres_db
 
   # POSTGRES DB
-  postgres:
+  postgres_db:
     restart: always
     image: postgres:latest
     env_file: 
       - django_variables.env
-    hostname: postgres
     ports:
       - 5432:5432
