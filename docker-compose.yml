@@ -1,13 +1,26 @@
-version: '3'
+version: '3.8'
 
 services:
 
+  # DJANGO APP
   web:
     build: .
     env_file:
       - django_variables.env
     command: >
-      bash -c "python manage.py migrate
-      && python manage.py runserver 0.0.0.0:8000"
+      bash -c "python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
+    depends_on:
+      - postgres
+
+  # POSTGRES DB
+  postgres:
+    restart: always
+    image: postgres:latest
+    env_file: 
+      - django_variables.env
+    hostname: postgres
+    ports:
+      - 5432:5432
